@@ -19,4 +19,4 @@ add_executable(algoai
 
 include(CTest)
 enable_testing()
-# add_subdirectory(tests)
+add_subdirectory(tests)

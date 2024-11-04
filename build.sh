@@ -1,3 +1,4 @@
  cmake -S . -B build
  cmake --build ./build
- ./build/algoai 
+ #./build/algoai 
+ ctest --test-dir build
