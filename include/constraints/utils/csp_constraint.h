@@ -4,7 +4,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include <constraints/utils/csp_variable.h>
+#include "csp_variable.h"
 
 namespace CSP
 {
@@ -12,12 +12,12 @@ namespace CSP
     class Assignment
     {
     private:
-        std::unordered_map<Variable&, T> _assignment;
+        std::unordered_map<Variable, T> _assignment;
     public:
-        Assignment(std::unordered_map<Variable&, T> assignment):_assignment(std::move(assignment)){};
+        Assignment(std::unordered_map<Variable, T> assignment):_assignment(std::move(assignment)){};
         ~Assignment() = default;
 
-        const std::unordered_map<Variable&, T>& getVariables() const {return _assignment;};
+        const std::unordered_map<Variable, T>& getVariables() const {return _assignment;};
     };
     
     template<typename T>
@@ -45,9 +45,8 @@ namespace CSP
                 assignment_values.push_back(assignment.getVariables().at(v));
             }
             
-
             // 2. Check the rule on assigned values
-            return_rule(assignment_values);
+            return _rule(assignment_values);
 
         };
     };

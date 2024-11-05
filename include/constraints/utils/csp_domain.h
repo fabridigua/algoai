@@ -9,7 +9,7 @@ namespace CSP
     class Domain
     {   
         public:
-            Domain(int& id, std::vector<T> range):variable_id(id),_values(std::move(range)){};
+            Domain(int id, std::vector<T> range):variable_id(id),_values(std::move(range)){};
             Domain(std::vector);
 
             void remove(const& T value) 
