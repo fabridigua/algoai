@@ -10,9 +10,8 @@ namespace CSP
     {   
         public:
             Domain(int id, std::vector<T> range):variable_id(id),_values(std::move(range)){};
-            Domain(std::vector);
 
-            void remove(const& T value) 
+            void remove(T value) 
             {
                 _values.erase(std::remove(_values.begin(),_values.end(), value), _values.end());
             }
