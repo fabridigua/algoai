@@ -13,7 +13,7 @@ namespace CSP
     class CSProblem
     {
     public:
-        CSProblem(/* args */){};
+        CSProblem(){};
         ~CSProblem(){};
 
         void addVariable(Variable v, Domain d) 
@@ -22,6 +22,7 @@ namespace CSP
             _domains[v] = d;
         };
         
+        void addConstraint(Constraint<T> c) {_constraints.push_back(c);}
 
 
     private:
