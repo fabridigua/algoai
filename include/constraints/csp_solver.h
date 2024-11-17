@@ -52,10 +52,12 @@ namespace CSP
         bool isValidAssignment(const CSProblem<T>& problem, Variable v, T value)
         {
             std::unordered_map<Variable, T> singleAssignment = {{v, value}};
-            Assignment<T> assignment = singleAssignment;
 
             for (Constraint<T> c: problem.getConstraints())
             {
+                // Copy single assisgment to test constraint
+                Assignment<T> assignment = singleAssignment;
+
                 // If constraint doen't involve variable v, don't check it
                 if(!c.has_variable(v)) continue;
 
