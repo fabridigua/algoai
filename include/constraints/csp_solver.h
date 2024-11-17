@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <chrono>
 
 #include <constraints/csp_problem.h>
 
@@ -26,26 +27,45 @@ namespace CSP
         };
 
 
-        CSPSolver(CSPSrategy s):_strategy(s){};
+        CSPSolver(CSPSrategy s):_strategy(s), _enable_chrono(false){};
         ~CSPSolver(){};
 
         bool solve(CSProblem<T>& problem)
         {
+            bool problem_solved = false;
+
+            if(_enable_chrono) _start = std::chrono::high_resolution_clock::now();
+
             switch (_strategy)
             {
                 case CSPSrategy::Backtracking:
-                    return backtracking(problem);
+                    problem_solved = backtracking(problem);
+                    break;
                 case CSPSrategy::BacktrackingEuristics:
-                    return backtracking_with_euristics(problem);
+                    problem_solved = backtracking_with_euristics(problem);
+                    break;
                 default:
-                    return false;
+                    problem_solved = false;
+                    break;
+            }
+            
+            if(_enable_chrono) 
+            {
+                _end = std::chrono::high_resolution_clock::now();
+                int duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(_end - _start).count();
+                std::cout << "Execution time: " << duration_ms << " ms" << std::endl;
             }
 
-            return false;
+            return problem_solved;
         }
+
+        void _enableChrono(bool enabled=true) {_enable_chrono = enabled;}
 
     private: 
         CSPSrategy _strategy;
+
+        bool _enable_chrono;
+        std::chrono::high_resolution_clock::time_point _start, _end;
 
         // Utility solver methods
         // Check if an assignment is correct

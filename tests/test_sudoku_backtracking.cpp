@@ -87,6 +87,8 @@ int main() {
     // Create Solver
     CSPSolver<int> solver(CSPSolver<int>::CSPSrategy::Backtracking);
 
+    solver._enableChrono();
+
     bool solved = solver.solve(sudoku);
 
     std::cout << "solved? " << solved << std::endl;
