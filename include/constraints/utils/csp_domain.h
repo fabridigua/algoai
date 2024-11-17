@@ -12,6 +12,11 @@ namespace CSP
             Domain() = default;
             Domain(std::vector<T> range):_values(std::move(range)){};
 
+            void add(T value)
+            {
+                _values.push_back(value);
+            }
+
             void remove(T value)
             {
                 _values.erase(std::remove(_values.begin(),_values.end(), value), _values.end());
@@ -24,7 +29,6 @@ namespace CSP
         private:
             // TODO: use std::set to improve erase operation ((O(log n) fpr set o O(1) for unordered_set))
             std::vector<T> _values;
-
 
     };
 

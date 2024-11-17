@@ -8,6 +8,54 @@
 
 using namespace CSP;
 
+void printSolution(std::unordered_map<Variable, int> solution)
+{
+    for (int i = 1; i <= 9; i++)
+    {
+        for (int j = 1; j <= 9; j++)
+        {
+            std::cout << solution[i*10 + j] << " ";
+            if(j == 3 || j== 6) std::cout << "| ";
+            if(j == 9) std::cout << std::endl;
+        }
+        if(i==3 || i == 6) std::cout << "- - -   - - -   - - -"<< std::endl;        
+    }
+}
+
+bool checkTestSolution(std::unordered_map<Variable, int> solution)
+{
+    // Test scheme solution:
+    // 3 4 2 | 6 8 7 | 9 1 5
+    // 5 6 8 | 9 1 3 | 4 2 7
+    // 1 9 7 | 2 5 4 | 6 8 3
+    // - - -   - - -   - - -
+    // 6 8 5 | 4 7 9 | 1 3 2
+    // 7 3 4 | 1 6 2 | 5 9 8
+    // 2 1 9 | 5 3 8 | 7 6 4
+    // - - -   - - -   - - -
+    // 9 2 6 | 3 4 5 | 8 7 1
+    // 8 5 1 | 7 2 6 | 3 4 9
+    // 4 7 3 | 8 9 1 | 2 5 6
+
+    std::unordered_map<int, int> test_sudoku = {
+        {11, 3}, {12, 4}, {13, 2}, {14, 6}, {15, 8}, {16, 7}, {17, 9}, {18, 1}, {19, 5},
+        {21, 5}, {22, 6}, {23, 8}, {24, 9}, {25, 1}, {26, 3}, {27, 4}, {28, 2}, {29, 7},
+        {31, 1}, {32, 9}, {33, 7}, {34, 2}, {35, 5}, {36, 4}, {37, 6}, {38, 8}, {39, 3},
+
+        {41, 6}, {42, 8}, {43, 5}, {44, 4}, {45, 7}, {46, 9}, {47, 1}, {48, 3}, {49, 2},
+        {51, 7}, {52, 3}, {53, 4}, {54, 1}, {55, 6}, {56, 2}, {57, 5}, {58, 9}, {59, 8},
+        {61, 2}, {62, 1}, {63, 9}, {64, 5}, {65, 3}, {66, 8}, {67, 7}, {68, 6}, {69, 4},
+
+        {71, 9}, {72, 2}, {73, 6}, {74, 3}, {75, 4}, {76, 5}, {77, 8}, {78, 7}, {79, 1},
+        {81, 8}, {82, 5}, {83, 1}, {84, 7}, {85, 2}, {86, 6}, {87, 3}, {88, 4}, {89, 9},
+        {91, 4}, {92, 7}, {93, 3}, {94, 8}, {95, 9}, {96, 1}, {97, 2}, {98, 5}, {99, 6}
+    };
+
+    bool solution_ok = true;
+    for (auto cell: test_sudoku) if(cell.second != solution[cell.first]) solution_ok = false;
+    return solution_ok;   
+}
+
 int main() {
     std::cout << "Test Sudoku Backtracking Solver.." << std::endl;
     
@@ -84,61 +132,32 @@ int main() {
         sudoku.addConstraint({square, all_different_rule});
     }
     
-    // Create Solver
+    // TEST 1: Backtracking Strategy
+    // Create Backtracking Solver
     CSPSolver<int> solver(CSPSolver<int>::CSPSrategy::Backtracking);
-
     solver._enableChrono();
-
-    bool solved = solver.solve(sudoku);
-
-    std::cout << "solved? " << solved << std::endl;
-
+    CSProblem backtracking_sudoku = sudoku;
+    solver.solve(backtracking_sudoku);
     // Print solution
     std::unordered_map<Variable, int> solution;
-    sudoku.getSolution(&solution);
+    backtracking_sudoku.getSolution(&solution);
+    printSolution(solution);
+    // Check solution
+    bool solution_ok = checkTestSolution(solution);
+    std::cout << "Sudoku test result with backtracking algorithm: " << (solution_ok? "passed":"failed") << std::endl;
 
-    for (int i = 1; i <= 9; i++)
-    {
-        for (int j = 1; j <= 9; j++)
-        {
-            std::cout << solution[i*10 + j] << " ";
-            if(j == 3 || j== 6) std::cout << "| ";
-            if(j == 9) std::cout << std::endl;
-        }
-        if(i==3 || i == 6) std::cout << "- - -   - - -   - - -"<< std::endl;        
-    }
-
-    // Test scheme solution:
-    // 3 4 2 | 6 8 7 | 9 1 5
-    // 5 6 8 | 9 1 3 | 4 2 7
-    // 1 9 7 | 2 5 4 | 6 8 3
-    // - - -   - - -   - - -
-    // 6 8 5 | 4 7 9 | 1 3 2
-    // 7 3 4 | 1 6 2 | 5 9 8
-    // 2 1 9 | 5 3 8 | 7 6 4
-    // - - -   - - -   - - -
-    // 9 2 6 | 3 4 5 | 8 7 1
-    // 8 5 1 | 7 2 6 | 3 4 9
-    // 4 7 3 | 8 9 1 | 2 5 6
-
-    std::unordered_map<int, int> test_sudoku = {
-        {11, 3}, {12, 4}, {13, 2}, {14, 6}, {15, 8}, {16, 7}, {17, 9}, {18, 1}, {19, 5},
-        {21, 5}, {22, 6}, {23, 8}, {24, 9}, {25, 1}, {26, 3}, {27, 4}, {28, 2}, {29, 7},
-        {31, 1}, {32, 9}, {33, 7}, {34, 2}, {35, 5}, {36, 4}, {37, 6}, {38, 8}, {39, 3},
-
-        {41, 6}, {42, 8}, {43, 5}, {44, 4}, {45, 7}, {46, 9}, {47, 1}, {48, 3}, {49, 2},
-        {51, 7}, {52, 3}, {53, 4}, {54, 1}, {55, 6}, {56, 2}, {57, 5}, {58, 9}, {59, 8},
-        {61, 2}, {62, 1}, {63, 9}, {64, 5}, {65, 3}, {66, 8}, {67, 7}, {68, 6}, {69, 4},
-
-        {71, 9}, {72, 2}, {73, 6}, {74, 3}, {75, 4}, {76, 5}, {77, 8}, {78, 7}, {79, 1},
-        {81, 8}, {82, 5}, {83, 1}, {84, 7}, {85, 2}, {86, 6}, {87, 3}, {88, 4}, {89, 9},
-        {91, 4}, {92, 7}, {93, 3}, {94, 8}, {95, 9}, {96, 1}, {97, 2}, {98, 5}, {99, 6}
-    };
-
-    bool solution_ok = true;
-    for (auto cell: test_sudoku) if(cell.second != solution[cell.first]) solution_ok = false;    
-
-    std::cout << "Sudoku test result: " << (solution_ok? "passed":"failed") << std::endl;
+    // TEST 1: Backtracking Forrward Checking Strategy
+    // Create Backtracking Solver
+    CSPSolver<int> fc_solver(CSPSolver<int>::CSPSrategy::ForwardChecking);
+    fc_solver._enableChrono();
+    CSProblem forwardcheck_sudoku = sudoku;
+    fc_solver.solve(forwardcheck_sudoku);
+    // Print solution
+    forwardcheck_sudoku.getSolution(&solution);
+    printSolution(solution);
+    // Check solution
+    solution_ok = checkTestSolution(solution);
+    std::cout << "Sudoku test result with backtracking algorithm: " << (solution_ok? "passed":"failed") << std::endl;
 
     return solution_ok;
 }

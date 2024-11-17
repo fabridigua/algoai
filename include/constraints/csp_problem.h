@@ -25,12 +25,20 @@ namespace CSP
         
         void addConstraint(Constraint<T> c) {_constraints.push_back(c);}
 
-        const Domain<T>& getDomain(const Variable& v) const
+        Domain<T>& getDomain(const Variable& v)
         {
             auto it = _domains.find(v);
-            // TODO check if not present
             
             return it->second;
+        }
+
+        std::unordered_map<Variable, Domain<T>> getDomainsCopy()
+        {            
+            return _domains;
+        }
+        void setDomains(std::unordered_map<Variable, Domain<T>> domains)
+        {            
+            _domains = domains;
         }
 
         const std::vector<Constraint<T>>& getConstraints() const {return _constraints;};
@@ -38,10 +46,10 @@ namespace CSP
         void assignValue(Variable variable, T value){ _state[variable] = value;}
         void unassignValue(Variable variable){ _state.erase(variable);}
 
-        bool getSolution(std::unordered_map<Variable, T>* solution){
-            // if(!_solved) return false;
+        bool getSolution(std::unordered_map<Variable, T>* solution)
+        {
             *solution = _state;
-            return true;
+            return _solved;
         }
 
         std::unordered_map<Variable, T> getCurrentState() const { return _state; }
@@ -57,6 +65,8 @@ namespace CSP
             }
             return unassigned;
         }
+
+        void set_solved(bool solved){_solved=solved;}
 
     private:
         std::vector<Variable> _variables;
