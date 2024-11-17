@@ -1,6 +1,6 @@
 #pragma once
 
-#include "csp_domain.h"
+#include <constraints/utils/csp_domain.h>
 
 namespace CSP
 {
