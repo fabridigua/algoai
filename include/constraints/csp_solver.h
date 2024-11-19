@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <constraints/csp_problem.h>
+#include <constraints/csp_binary_problem.h>
 #include <constraints/utils/csp_domain.h>
 
 namespace CSP
@@ -20,8 +21,8 @@ namespace CSP
         {
             Backtracking,
             BacktrackingEuristics,
-            ForwardChecking
-            //Arc Consistency (AC-3)
+            ForwardChecking,
+            ArcConsistency //(AC-3)
             // Local Search con Propagazione di Vincoli (Min-Conflicts)
             // Algoritmo di Ricerca con Backjumping
             // Tecniche di Propagazione di Vincoli Avanzate (e.g., Constraint Propagation)
@@ -47,6 +48,9 @@ namespace CSP
                     break;
                 case CSPSrategy::BacktrackingEuristics:
                     problem_solved = backtracking_with_euristics(problem);
+                    break;
+                case CSPSrategy::ArcConsistency:
+                    problem_solved = arc_consistency((CSPBinaryProblem<T>&)problem);
                     break;
                 default:
                     problem_solved = false;
@@ -220,7 +224,73 @@ namespace CSP
         }
 
         bool backtracking_with_euristics(CSProblem<T>& problem){return false;};
-        // TODO (other 5 strategies)
+
+        bool arc_consistency(CSPBinaryProblem<T>& problem){
+
+            // 0. Retrive queue of arcs constraints
+            std::queue<Constraint<T>> queue = problem.get_queue();
+
+            while (!queue.empty()) 
+            {
+                // 1. Take the first arc (X,Y) and check the of X respect of Y
+                Constraint<T> arc = queue.front();
+                queue.pop();
+
+                Variable X = arc.getConstraintVariables()[0];
+                Variable Y = arc.getConstraintVariables()[1];
+
+                Domain<T>& Dx = problem.getDomain(X);
+                Domain<T>& Dy = problem.getDomain(Y);
+
+                bool changed = false;
+
+                for(auto Di: Dx.get_values())
+                {
+                    // 1.1 For each Di in D(X) check if C(Di, Dj) for each Dj in D(Y)
+                    bool consistent = false;
+                    for(auto Dj: Dy.get_values())
+                    {
+                        Assignment<T> assignment;
+                        assignment.assign(X,Di);
+                        assignment.assign(Y,Dj);
+                        if(arc.is_satisfied(assignment))
+                        {
+                            consistent = true;
+                            break;
+                        }
+                    }
+                    // If no remove Di in D(X)
+                    if(!consistent) 
+                    {
+                        Dx.remove(Di);   
+                        changed = true;
+                    }             
+                    // Otherwise check next D(X) value
+                }
+
+                // If Dx is empty, problem has no solution
+                if(Dx.get_values().empty()) return false;
+                
+                // If the domain has been reduced, add again each arc to queue to analyze them 
+                if(changed)
+                {
+                    for(auto neighbor: problem.get_neighbors(X))
+                    {
+                        if(neighbor != Y) problem.addConstraint(arc.duplicate({neighbor,X}));
+                    }
+                }
+            }
+
+            for(auto v: problem.getVariables())
+            {
+                Domain<T>& domain_v = problem.getDomain(v);
+                if(domain_v.get_values().empty()) return false;
+                // Consider the only value of domain as valid (> 1 if more suitable solutions)
+                problem.assignValue(v, domain_v.get_values()[0]);
+            }
+
+            return true;
+        };
 
 
     };

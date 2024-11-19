@@ -48,6 +48,8 @@ namespace CSP
         ~Constraint() = default;
 
         std::vector<Variable> getConstraintVariables() const { return _variables;}
+
+        Constraint duplicate(std::vector<Variable> variables) {return Constraint<T>(variables, _rule);} 
         
         bool has_variable(const Variable& v) {return std::find(_variables.begin(), _variables.end(), v) != _variables.end();}
 

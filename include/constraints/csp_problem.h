@@ -23,7 +23,7 @@ namespace CSP
             _domains[v] = std::move(d);
         };
         
-        void addConstraint(Constraint<T> c) {_constraints.push_back(c);}
+        virtual void addConstraint(Constraint<T> c) {_constraints.push_back(c);}
 
         Domain<T>& getDomain(const Variable& v)
         {
@@ -68,7 +68,7 @@ namespace CSP
 
         void set_solved(bool solved){_solved=solved;}
 
-    private:
+    protected:
         std::vector<Variable> _variables;
         std::unordered_map<Variable, Domain<T>> _domains;
         std::vector<Constraint<T>> _constraints;
